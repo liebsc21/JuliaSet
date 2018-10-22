@@ -5,14 +5,12 @@ Code based on:
 "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
 """
 
-# import os
 import sys
 import logging
 import argparse
 import time
 import csv
 import math
-# import pprint
 try:
     import colorer
     colorer.__name__
@@ -31,10 +29,11 @@ def chunks(l, n):
     return result
 
 
-def produce_grid(desired_width, max_iterations, steps_angle):
+def produce_grid(desired_width, max_iterations, steps_angle, exponent, radius):
     """ Create a list of complex coordinates (zs) and complex parameters (cs),
     build Julia set, and display
-    based on: "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
+    based on:
+    "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
     """
     x_step = (float(x2 - x1) / float(desired_width))
     y_step = (float(y1 - y2) / float(desired_width))
@@ -51,7 +50,6 @@ def produce_grid(desired_width, max_iterations, steps_angle):
 
     for i_angle in range(steps_angle):
         this_angle = 2.0 * math.pi * i_angle / steps_angle
-        radius = 0.7563447119534848
         this_c_real = radius * math.sin(this_angle)
         this_c_imag = radius * math.cos(this_angle)
 
@@ -73,8 +71,9 @@ def produce_grid(desired_width, max_iterations, steps_angle):
             logging.error("output lendth = {}, with desired_width = {}"
                           .format(len(output), desired_width))
             Exception("unkown dimension")
-        chunked = chunks(output, int(math.sqrt(1.0 * len(output))) )
-        with open("output_{}.csv".format(str(i_angle).zfill(3)), "wb") as outputfile:
+        chunked = chunks(output, int(math.sqrt(1.0 * len(output))))
+        outfile = "output_{}.csv".format(str(i_angle).zfill(3))
+        with open(outfile, "wb") as outputfile:
             wr = csv.writer(outputfile)
             for row in chunked:
                 wr.writerow(row)
@@ -84,9 +83,10 @@ def produce_grid(desired_width, max_iterations, steps_angle):
         print "{:4.0f}th step took".format(i_angle), secs, "seconds"
 
 
-def calculate_z_serial(maxiter, zs, cs):
+def calculate_z_serial(maxiter, zs, cs, exponent):
     """Calculate output list using Julia update rule
-    based on: "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
+    based on:
+    "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
     """
     output = [0] * len(zs)
     for i in range(len(zs)):
@@ -94,7 +94,7 @@ def calculate_z_serial(maxiter, zs, cs):
         z = zs[i]
         c = cs[i]
         while abs(z) < 2 and n < maxiter:
-            z = z * z + c
+            z = z ** exponent + c
             n += 1
         output[i] = n
     return output
@@ -107,9 +107,19 @@ def main(argv):
     parser.add_argument("-d", '--debug',
                         default=False, action='store_true',
                         help='print in debug output')
-    parser.add_argument("-N", '--Ntimes',
-                        default=1, type=int,
-                        help='print multiple times')
+    parser.add_argument("-e", '--exponent',
+                        default=2., type=float,
+                        help='exponent of z in julia update rule')
+    parser.add_argument("-g", '--gridwidth',
+                        default=1000, type=int,
+                        help='number of steps in x and y')
+    parser.add_argument("-N", '--Nsteps',
+                        default=200, type=int,
+                        help='number of steps in angle')
+    parser.add_argument("-r", '--radius',
+                        default=0.7563447119534848, type=float,
+                        help='absolute value of c')
+
     parser.add_argument("inputs", nargs="*",
                         help="further input")
     args = parser.parse_args(argv)
@@ -121,7 +131,11 @@ def main(argv):
         logging.basicConfig(level=logging.INFO)
         logging.debug("Set log level to INFO")
 
-    produce_grid(desired_width=1000, max_iterations=300, steps_angle=200)
+    produce_grid(desired_width=args.gridwidth,
+                 max_iterations=300,
+                 steps_angle=args.Nsteps,
+                 exponent=args.exponent,
+                 radius=args.radius)
 
 
 if __name__ == "__main__":
