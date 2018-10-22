@@ -66,9 +66,9 @@ def produce_grid(desired_width, max_iterations, steps_angle, exponent, radius):
                 cs.append(complex(this_c_real, this_c_imag))
 
         start_time = time.time()
-        output = calculate_z_serial(max_iterations, zs, cs)
+        output = calculate_z_serial(max_iterations, zs, cs, exponent)
         if not len(output) == (desired_width) * (desired_width):
-            logging.error("output lendth = {}, with desired_width = {}"
+            logging.error("output length = {}, with desired_width = {}"
                           .format(len(output), desired_width))
             Exception("unkown dimension")
         chunked = chunks(output, int(math.sqrt(1.0 * len(output))))
@@ -80,7 +80,8 @@ def produce_grid(desired_width, max_iterations, steps_angle, exponent, radius):
 
         end_time = time.time()
         secs = end_time - start_time
-        print "{:4.0f}th step took".format(i_angle), secs, "seconds"
+        logging.debug("{:4.0f}th step took {:4.1f}seconds"
+                      .format(i_angle, secs))
 
 
 def calculate_z_serial(maxiter, zs, cs, exponent):
@@ -111,7 +112,7 @@ def main(argv):
                         default=2., type=float,
                         help='exponent of z in julia update rule')
     parser.add_argument("-g", '--gridwidth',
-                        default=1000, type=int,
+                        default=100, type=int,
                         help='number of steps in x and y')
     parser.add_argument("-N", '--Nsteps',
                         default=200, type=int,
@@ -131,11 +132,14 @@ def main(argv):
         logging.basicConfig(level=logging.INFO)
         logging.debug("Set log level to INFO")
 
+    start = time.time()
     produce_grid(desired_width=args.gridwidth,
                  max_iterations=300,
                  steps_angle=args.Nsteps,
                  exponent=args.exponent,
                  radius=args.radius)
+    end = time.time()
+    logging.info("Total execution took: {:4.1f}s.".format(end - start))
 
 
 if __name__ == "__main__":

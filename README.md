@@ -7,7 +7,6 @@ The coding challenge for this term's Computing Cafe is to provide the fastest po
 f(z) = z ^ n + r * exp(i * phi).
 ```
 
-
 The animation will be created for ```N``` steps with angles phi uniformly distributed in ```[0,2 pi)```. For each step a csv file has to be written for each step of the animation (i.e. each fixed angle), containing the values in ```gridwidth``` points in both coordinates of the complex plane for ```-1.8 < x < 1.8``` (same for ```y```). The csv should store the number of iterations after which the cut-off condition ```|z| > 2.0``` is fulfilled for each point. A cut-off after 300 iterations is to be applied.
 
 The free parameters we'll choose at random, after the deadline are:
