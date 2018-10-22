@@ -17,3 +17,4 @@ The free parameters we'll choose at random, after the deadline are:
 - ```gridwidth```: number of steps for both x and y
 
 An (very slow) example implementation can be found in [example.py](example.py). The script [plot_result.py](plot_result.py) will read in the csv files and create an animation from that.
+Code in [example.py](example.py) based on ["High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014][http://shop.oreilly.com/product/0636920028963.do].

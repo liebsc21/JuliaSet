@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-""" example implementation of CPU-bound problem
+""" example implementation of Julia set
+Code based on:
+"High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
 """
 
 # import os
@@ -29,9 +31,11 @@ def chunks(l, n):
     return result
 
 
-def calc_pure_python(desired_width, max_iterations, steps_angle):
+def produce_grid(desired_width, max_iterations, steps_angle):
     """ Create a list of complex coordinates (zs) and complex parameters (cs),
-    build Julia set, and display """
+    build Julia set, and display
+    based on: "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
+    """
     x_step = (float(x2 - x1) / float(desired_width))
     y_step = (float(y1 - y2) / float(desired_width))
     x = []
@@ -64,7 +68,7 @@ def calc_pure_python(desired_width, max_iterations, steps_angle):
                 cs.append(complex(this_c_real, this_c_imag))
 
         start_time = time.time()
-        output = calculate_z_serial_purepython(max_iterations, zs, cs)
+        output = calculate_z_serial(max_iterations, zs, cs)
         if not len(output) == (desired_width) * (desired_width):
             logging.error("output lendth = {}, with desired_width = {}"
                           .format(len(output), desired_width))
@@ -80,8 +84,10 @@ def calc_pure_python(desired_width, max_iterations, steps_angle):
         print "{:4.0f}th step took".format(i_angle), secs, "seconds"
 
 
-def calculate_z_serial_purepython(maxiter, zs, cs):
-    """Calculate output list using Julia update rule"""
+def calculate_z_serial(maxiter, zs, cs):
+    """Calculate output list using Julia update rule
+    based on: "High Performance Python" by Miche Gorelick, Ian Ozsvald. O'Reilly 2014
+    """
     output = [0] * len(zs)
     for i in range(len(zs)):
         n = 0
@@ -115,7 +121,7 @@ def main(argv):
         logging.basicConfig(level=logging.INFO)
         logging.debug("Set log level to INFO")
 
-    calc_pure_python(desired_width=1000, max_iterations=300, steps_angle=200)
+    produce_grid(desired_width=1000, max_iterations=300, steps_angle=200)
 
 
 if __name__ == "__main__":
