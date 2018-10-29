@@ -70,7 +70,7 @@ def main(argv):
 
     ani = animation.ArtistAnimation(fig, steps, interval=50, blit=True)
     ani.save('animation.mp4', bitrate=100000)
-    # plt.show()
+    plt.show()
 
 
 if __name__ == "__main__":
