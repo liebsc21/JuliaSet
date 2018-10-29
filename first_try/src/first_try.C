@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
     boost::program_options::options_description desc("Allowed options");
     desc.add_options()
       ("help", "produce help message")
-      ("parameter1", po::value<int>() -> default_value(3), "")
-      ("card", po::value<string>(), "path to a run card");
+      ("gridwidth", po::value<int>(), "")
+      ("card", po::value<string>() -> default_value("RunCards/Run_1.ini"), "path to a run card (including run card)");
   
     boost::program_options::variables_map vm;
     boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -36,25 +36,28 @@ int main(int argc, char* argv[])
       return 1;
     }
   
-    int parameter = vm["parameter1"].as<int>();
-  
     string card = vm["card"].as<string>();
-  
     boost::property_tree::ptree pt;
     boost::property_tree::ini_parser::read_ini( card, pt );
   
-    double gridwidth = pt.get<double>("grid parameters.gridwidth");
+    int gridwidth = pt.get<int>("grid parameters.gridwidth");
+//    std::cout << "gridwidth  = " << gridwidth << "\n";
 
-    std::cout << "gridwidth  = " << gridwidth << "\n";
-    std::cout << "parameter  = " << parameter << "\n";
-    return 0;
+    if(vm.count("gridwidth")) {
+      const int new_gridwidth = vm["gridwidth"].as<const int>(); 
+//      cout << "Resetting gridwidth to " << new_gridwidth << "\n";
+      gridwidth = new_gridwidth;
+    }
+
   }
   catch(exception& e) {
-      cerr << "error: " << e.what() << "\n";
-      return 1;
+    cerr << "error: " << e.what() << "\n";
+    return 1;
   }
   catch(...) {
-      cerr << "Exception of unknown type!\n";
+    cerr << "Exception of unknown type!\n";
+    return 1;
   }
 
+  return 0;
 }
