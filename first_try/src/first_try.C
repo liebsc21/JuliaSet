@@ -6,51 +6,55 @@
 /* The simplest usage of the library.
  */
 
-//#include <boost/program_options/options_description.hpp>
-//#include <boost/program_options/variables_map.hpp>
-//#include <boost/program_options/option.hpp>
-
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 #include <iostream>
 #include <iterator>
 using namespace std;
 
-int main(int ac, char* av[])
+int main(int argc, char* argv[])
 {
-    try {
-
-        po::options_description desc("Allowed options");
-        desc.add_options()
-            ("help", "produce help message")
-            ("compression", po::value<double>(), "set compression level")
-        ;
-
-        po::variables_map vm;        
-        po::store(po::parse_command_line(ac, av, desc), vm);
-        po::notify(vm);    
-
-        if (vm.count("help")) {
-            cout << desc << "\n";
-            return 0;
-        }
-
-        if (vm.count("compression")) {
-            cout << "Compression level was set to " 
-                 << vm["compression"].as<double>() << ".\n";
-        } else {
-            cout << "Compression level was not set.\n";
-        }
+  try {
+    boost::program_options::positional_options_description p;
+    p.add("card", -1);
+    /* program options */
+    boost::program_options::options_description desc("Allowed options");
+    desc.add_options()
+      ("help", "produce help message")
+      ("parameter1", po::value<int>() -> default_value(3), "")
+      ("card", po::value<string>(), "path to a run card");
+  
+    boost::program_options::variables_map vm;
+    boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+    boost::program_options::notify(vm);
+  
+    if (vm.count("help")) {
+      cout << desc << '\n';
+      return 1;
     }
-    catch(exception& e) {
-        cerr << "error: " << e.what() << "\n";
-        return 1;
-    }
-    catch(...) {
-        cerr << "Exception of unknown type!\n";
-    }
+  
+    int parameter = vm["parameter1"].as<int>();
+  
+    string card = vm["card"].as<string>();
+  
+    boost::property_tree::ptree pt;
+    boost::property_tree::ini_parser::read_ini( card, pt );
+  
+    double gridwidth = pt.get<double>("grid parameters.gridwidth");
 
-    std::cout << "bla\n";
+    std::cout << "gridwidth  = " << gridwidth << "\n";
+    std::cout << "parameter  = " << parameter << "\n";
     return 0;
+  }
+  catch(exception& e) {
+      cerr << "error: " << e.what() << "\n";
+      return 1;
+  }
+  catch(...) {
+      cerr << "Exception of unknown type!\n";
+  }
+
 }
