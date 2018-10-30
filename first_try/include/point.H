@@ -9,11 +9,12 @@ using namespace std;
 class Point {
   private:
     const complex<double> I = (0.0,1.0);
-    double m_n, m_r, m_phi; // TODO: change m_n to int?
+    double m_r, m_phi;
+    int m_n;
     complex<double> m_z;
     int m_it;
   public:
-    Point(const double &n, const double &r, const double &phi) : 
+    Point(const int &n, const double &r, const double &phi) : 
       m_n(n), m_r(r), m_phi(phi) {}
     void set_point(const double &re, const double &im);
     complex<double> f();
