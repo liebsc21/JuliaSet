@@ -15,10 +15,7 @@ complex<double> Point::f(){
 
 int Point::get_it(){
   while(abs(m_z)<=2 && m_it<=300) {
-//    cout << "z = " << m_z << "\n";
-//    cout << "|z| = " << abs(m_z) << "\n";
     f();
-//    cout << "Number of iterations = " << m_it << "\n" ;
   }
   return m_it;
 }

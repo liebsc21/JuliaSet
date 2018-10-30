@@ -8,7 +8,7 @@ using namespace std;
 
 class Point {
   private:
-    const complex<double> I = (0.0,1.0);
+    const complex<double> I = {0.0,1.0};
     double m_r, m_phi;
     int m_n;
     complex<double> m_z;
