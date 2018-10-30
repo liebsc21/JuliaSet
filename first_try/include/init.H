@@ -28,10 +28,10 @@ class Init {
     double get_r()   { return m_r; }
     double get_phi() { return m_phi; }
 
-    double get_m_xmin() { return m_xmin; }
-    double get_m_xmax() { return m_xmax; }
-    double get_m_ymin() { return m_ymin; }
-    double get_m_ymax() { return m_ymax; }
+    double get_xmin() { return m_xmin; }
+    double get_xmax() { return m_xmax; }
+    double get_ymin() { return m_ymin; }
+    double get_ymax() { return m_ymax; }
     int get_gridwidth() { return m_gridwidth; }
 
     int get_N() { return m_N; }
