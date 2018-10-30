@@ -26,25 +26,28 @@ int main(int argc, char* argv[]){
     const double ymin = init.get_ymin();
     const double ymax = init.get_ymax();
     const double gridwidth = init.get_gridwidth();
-    const double delta_x = (xmax-xmin)/gridwidth;
-    const double delta_y = (ymax-ymin)/gridwidth;
+    const double delta_x = gridwidth==1 ? 0:(xmax-xmin)/(gridwidth-1);
+    const double delta_y = gridwidth==1 ? 0:(ymax-ymin)/(gridwidth-1);
+    /* this is how Carsten calculates it */
+//    const double delta_x = (xmax-xmin)/(gridwidth);
+//    const double delta_y = (ymax-ymin)/(gridwidth);
     const int N = init.get_N();
 
-    for(int t=0; t<=N; t++){
+    for(int t=0; t<N; t++){
       Point point(n,r,phi+2*M_PI*t/N);
       ofstream myfile;
-    std::stringstream ss;
-    ss << std::setw(3) << std::setfill('0') << t;
-cout << ss.str() << "\n";
+      std::stringstream ss;
+      ss << std::setw(3) << std::setfill('0') << t;
+      cout << ss.str() << "\n";
       myfile.open("output"+ss.str()+".csv");
 
-      for(int i_x=0; i_x<=gridwidth; i_x++){
-        double x = xmin + i_x*delta_x;
-        for(int i_y=0; i_y<=gridwidth; i_y++){
-          double y = ymax - i_y*delta_y;
+      for(int i_y=0; i_y<gridwidth; i_y++){
+        double y = ymax - i_y*delta_y;
+        for(int i_x=0; i_x<gridwidth; i_x++){
+          double x = xmin + i_x*delta_x;
           point.set_point(x,y);
           int it = point.get_it();
-          if (i_y==0) myfile << it;
+          if (i_x==0) myfile << it;
           else myfile << "," << it;
         }
         myfile << "\n";
