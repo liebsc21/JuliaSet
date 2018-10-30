@@ -4,13 +4,12 @@
 
 void Point::set_point(const double &re, const double &im){
   m_z  = {re,im};
-//    cout << "z = " << m_z << "\n";
   m_it = 0;
 }
 
 complex<double> Point::f(){
   m_it++;
-  m_z = pow(m_z,m_n) + m_r*exp(I*m_phi);
+  m_z = pow(m_z,m_n) + m_c;
 }
 
 int Point::get_it(){

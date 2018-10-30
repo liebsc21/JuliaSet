@@ -8,6 +8,7 @@ Init::Init(int argc, char* argv[]){
   desc.add_options()
     ("help", "produce help message")
     ("gridwidth", po::value<int>(), "")
+    ("steps", po::value<int>(), "")
     ("card", po::value<string>() -> default_value("RunCards/Run_1.ini"), "path to a run card (including run card)");
 
   boost::program_options::variables_map vm;
@@ -32,11 +33,9 @@ Init::Init(int argc, char* argv[]){
   m_r   = pt.get<double>("function parameters.r");
   m_phi = pt.get<double>("function parameters.phi");
   m_N = pt.get<int>("animation parameters.N");
-//  std::cout << "gridwidth  = " << gridwidth << "\n";
 
-  if(vm.count("gridwidth")) {
-    const int new_gridwidth = vm["gridwidth"].as<const int>(); 
-//    cout << "Resetting gridwidth to " << new_gridwidth << "\n";
-    m_gridwidth = new_gridwidth;
-  }
+  if(vm.count("gridwidth"))
+     m_gridwidth = vm["gridwidth"].as<const int>();
+  if(vm.count("steps"))
+     m_N = vm["steps"].as<const int>();
 }
