@@ -50,8 +50,8 @@ def produce_grid(desired_width, max_iterations, steps_angle, exponent, radius):
 
     for i_angle in range(steps_angle):
         this_angle = 2.0 * math.pi * i_angle / steps_angle
-        this_c_real = radius * math.sin(this_angle)
-        this_c_imag = radius * math.cos(this_angle)
+        this_c_real = radius * math.cos(this_angle)
+        this_c_imag = radius * math.sin(this_angle)
 
         # Build a list of coordinates and the initial condition for each cell.
         # Note that our initial condition is a constant and could easily
