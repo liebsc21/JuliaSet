@@ -7,9 +7,11 @@ Init::Init(int argc, char* argv[]){
   boost::program_options::options_description desc("Allowed options");
   desc.add_options()
     ("help", "produce help message")
-    ("gridwidth", po::value<int>(), "")
-    ("steps", po::value<int>(), "")
-    ("card", po::value<string>() -> default_value("RunCards/Run_1.ini"), "path to a run card (including run card)");
+    ("gridwidth", po::value<int>(), "number of pixels in x- and y-direction")
+    ("steps"    , po::value<int>(), "number of csv-files")
+    ("exponent" , po::value<int>(), "n in f(z)=z**n+c")
+    ("radius"   , po::value<double>(), "r in c=r*exp(i*phi)")
+    ("card"     , po::value<string>() -> default_value("RunCards/Run_1.ini"), "path to a run card (including run card)");
 
   boost::program_options::variables_map vm;
   boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -38,4 +40,8 @@ Init::Init(int argc, char* argv[]){
      m_gridwidth = vm["gridwidth"].as<const int>();
   if(vm.count("steps"))
      m_N = vm["steps"].as<const int>();
+  if(vm.count("exponent"))
+     m_n = vm["exponent"].as<const int>();
+  if(vm.count("radius"))
+     m_r = vm["radius"].as<const double>();
 }

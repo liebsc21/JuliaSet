@@ -1,5 +1,4 @@
 #include <iostream>
-//#include <iterator>
 using namespace std;
 
 #include "init.H"
@@ -9,7 +8,6 @@ using namespace std;
 #include <string>
 #include <sstream>
 #include <iomanip>
-//using namespace std::chrono_literals;
 
 
 int main(int argc, char* argv[]){
@@ -43,8 +41,10 @@ int main(int argc, char* argv[]){
 
       for(int i_y=0; i_y<gridwidth; i_y++){
         double y = ymax - i_y*delta_y;
+
         for(int i_x=0; i_x<gridwidth; i_x++){
           double x = xmin + i_x*delta_x;
+
           point.set_point(x,y);
           int it = point.get_it();
           if (i_x==0) myfile << it;

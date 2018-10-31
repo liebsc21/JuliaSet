@@ -11,6 +11,7 @@ macro(use_cxx11)
   endif ()
 endmacro(use_cxx11)
 
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
 use_cxx11()
 
 #set (CMAKE_CXX_STANDARD 11)
