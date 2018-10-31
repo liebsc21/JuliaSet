@@ -8,6 +8,7 @@ using namespace std;
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <list>
 
 
 int main(int argc, char* argv[]){
@@ -31,34 +32,61 @@ int main(int argc, char* argv[]){
 //    const double delta_y = (ymax-ymin)/(gridwidth);
     const int N = init.get_N();
 
-    for(int t=0; t<N; t++){
+    /* iterate over steps, each producing one csv-file */
+    for(int t=0; t<N/2; t++){
+      list<list<double>> grid;
       Point point(n,r,phi+2*M_PI*t/N);
-      ofstream myfile;
-      std::stringstream ss;
-      ss << std::setw(3) << std::setfill('0') << t;
-      cout << ss.str() << "\n";
-      myfile.open("output"+ss.str()+".csv");
 
       for(int i_y=0; i_y<gridwidth; i_y++){
         double y = ymax - i_y*delta_y;
+        list<double> xrow;
 
         for(int i_x=0; i_x<gridwidth; i_x++){
           double x = xmin + i_x*delta_x;
 
           point.set_point(x,y);
           int it = point.get_it();
-          if (i_x==0) myfile << it;
-          else myfile << "," << it;
+          xrow.push_back(it);
         }
-        myfile << "\n";
+        grid.push_back(xrow);
       }
-      myfile.close();
+
+      /* write to file 1-N/2 */
+      ofstream myfile1, myfile2;
+      stringstream ss1, ss2;
+      ss1 << setw(3) << setfill('0') << t;
+      ss2 << setw(3) << setfill('0') << N-1-t;
+      cout << ss1.str() << "\n";
+      myfile1.open("output"+ss1.str()+".csv");
+      for(list<list<double>>::iterator grid_it=grid.begin();
+          grid_it!=grid.end(); ++grid_it){
+        for(list<double>::iterator xrow_it=grid_it->begin();
+            xrow_it!=grid_it->end(); ++xrow_it){
+          if (xrow_it!=grid_it->begin()) myfile1 << "," << *xrow_it;
+          else myfile1 << *xrow_it;
+        }
+        myfile1 << "\n";
+      }
+      myfile1.close();
+
+      /* write to file N/2-N*/
+      myfile2.open("output"+ss2.str()+".csv");
+      for(list<list<double>>::reverse_iterator grid_rit=grid.rbegin();
+          grid_rit!=grid.rend(); ++grid_rit){
+        for(list<double>::iterator xrow_it=grid_rit->begin();
+            xrow_it!=grid_rit->end(); ++xrow_it){
+          if (xrow_it!=grid_rit->begin()) myfile2 << "," << *xrow_it;
+          else myfile2 << *xrow_it;
+        }
+        myfile2 << "\n";
+      }
+      myfile2.close();
     }
 
     auto end = chrono::steady_clock::now();
     cout << "Elapsed time = " <<
-    chrono::duration_cast<chrono::milliseconds>(end-start).count() << 
-    " miliseconds\n";
+    chrono::duration_cast<chrono::milliseconds>(end-start).count()/1000. << 
+    " seconds\n";
   }
   catch(exception& e) {
     cerr << "error: " << e.what() << "\n";
