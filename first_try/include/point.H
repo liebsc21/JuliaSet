@@ -20,7 +20,8 @@ class Point {
     void f();
     int get_it();
     //TODO: make m_z public and invoke arg directly in main -> faster?
-    double phi(){ return arg(m_z); }
+    double get_phi();
+    double get_r(){ return abs(m_z); }
 };
 
 #endif /* POINT_H */
