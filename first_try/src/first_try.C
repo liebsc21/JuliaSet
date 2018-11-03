@@ -31,24 +31,33 @@ int main(int argc, char* argv[]){
 //    const double delta_x = (xmax-xmin)/(gridwidth);
 //    const double delta_y = (ymax-ymin)/(gridwidth);
     const int N = init.get_N();
+    const double alpha = 2.*M_PI/n;
+//cout<<"alpha = " << alpha << "\n";
 
     /* iterate over steps, each producing one csv-file */
     for(int t=0; t<N/2; t++){
-      list<list<double>> grid;
+      vector<vector<double>> grid(gridwidth,
+                             vector<double>(gridwidth,0));
+      vector<vector<double>> &grid_ref = grid;
       Point point(n,r,phi+2*M_PI*t/N);
 
       for(int i_y=0; i_y<gridwidth; i_y++){
         double y = ymax - i_y*delta_y;
-        list<double> xrow;
 
         for(int i_x=0; i_x<gridwidth; i_x++){
           double x = xmin + i_x*delta_x;
 
+//cout<<"x = " << x << "\n";
+//cout<<"y = " << y << "\n";
           point.set_point(x,y);
-          int it = point.get_it();
-          xrow.push_back(it);
+//cout<<"arg = " << point.phi() << "\n";
+          if (x*x+y*y>ymax*ymax || 
+              (0.<=point.phi() && point.phi()<alpha) ){
+            int it = point.get_it();
+            grid[i_y][i_x] = it;
+          }
+          else grid[i_y][i_x] = 0;
         }
-        grid.push_back(xrow);
       }
 
       /* write to file 1-N/2 */
@@ -58,11 +67,11 @@ int main(int argc, char* argv[]){
       ss2 << setw(3) << setfill('0') << N-1-t;
       cout << ss1.str() << "\n";
       myfile1.open("output"+ss1.str()+".csv");
-      for(list<list<double>>::iterator grid_it=grid.begin();
-          grid_it!=grid.end(); ++grid_it){
-        for(list<double>::iterator xrow_it=grid_it->begin();
-            xrow_it!=grid_it->end(); ++xrow_it){
-          if (xrow_it!=grid_it->begin()) myfile1 << "," << *xrow_it;
+      for(vector<vector<double>>::iterator yrow_it=grid.begin();
+          yrow_it!=grid.end(); ++yrow_it){
+        for(vector<double>::iterator xrow_it=yrow_it->begin();
+            xrow_it!=yrow_it->end(); ++xrow_it){
+          if (xrow_it!=yrow_it->begin()) myfile1 << "," << *xrow_it;
           else myfile1 << *xrow_it;
         }
         myfile1 << "\n";
@@ -71,11 +80,11 @@ int main(int argc, char* argv[]){
 
       /* write to file N/2-N*/
       myfile2.open("output"+ss2.str()+".csv");
-      for(list<list<double>>::reverse_iterator grid_rit=grid.rbegin();
-          grid_rit!=grid.rend(); ++grid_rit){
-        for(list<double>::iterator xrow_it=grid_rit->begin();
-            xrow_it!=grid_rit->end(); ++xrow_it){
-          if (xrow_it!=grid_rit->begin()) myfile2 << "," << *xrow_it;
+      for(vector<vector<double>>::reverse_iterator yrow_rit=grid.rbegin();
+          yrow_rit!=grid.rend(); ++yrow_rit){
+        for(vector<double>::iterator xrow_it=yrow_rit->begin();
+            xrow_it!=yrow_rit->end(); ++xrow_it){
+          if (xrow_it!=yrow_rit->begin()) myfile2 << "," << *xrow_it;
           else myfile2 << *xrow_it;
         }
         myfile2 << "\n";

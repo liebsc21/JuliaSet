@@ -19,6 +19,8 @@ class Point {
     void set_point(const double &re, const double &im);
     void f();
     int get_it();
+    //TODO: make m_z public and invoke arg directly in main -> faster?
+    double phi(){ return arg(m_z); }
 };
 
 #endif /* POINT_H */
