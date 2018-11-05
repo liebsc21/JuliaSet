@@ -24,6 +24,7 @@ int main(int argc, char* argv[]){
     const double xmax = init.get_xmax();
     const double ymin = init.get_ymin();
     const double ymax = init.get_ymax();
+    const double rmin2 = min(xmax*xmax,ymax*ymax);
     const double gridwidth = init.get_gridwidth();
     const double delta_x = gridwidth==1 ? 0:(xmax-xmin)/(gridwidth-1);
     const double delta_y = gridwidth==1 ? 0:(ymax-ymin)/(gridwidth-1);
@@ -32,7 +33,8 @@ int main(int argc, char* argv[]){
 //    const double delta_y = (ymax-ymin)/(gridwidth);
     const int N = init.get_N();
     const double alpha = 2.*M_PI/n;
-    const double eps   = 0.0001; // required to sort points in sectors
+    const double eps   = M_PI/90; //TODO: increase with n
+    const bool debug = init.get_debug();
 //cout<<"alpha = " << alpha << "\n";
 
     /* iterate over steps, each producing one csv-file */
@@ -48,35 +50,36 @@ int main(int argc, char* argv[]){
         for(int i_x=0; i_x<gridwidth; i_x++){
           double x = xmin + i_x*delta_x;
 
-//cout<<"(x,y) = (" << x << "," << y << ")\n";
           point.set_point(x,y);
-//cout<<"arg = " << point.get_phi() << "\n";
           /* fill zeroth sector and area outside circle */
-          if (x*x+y*y>ymax*ymax || 
-              (0.<=point.get_phi() && point.get_phi()<alpha) ){
+          if (x*x+y*y>rmin2 || 
+              (0.<=point.get_phi() && point.get_phi()<=alpha+eps) ){
             int it = point.get_it();
             grid[i_y][i_x] = it;
           }
           else{
-            grid[i_y][i_x] = 0;
             /* fill missing sectors */
-            //int sector = (point.get_phi()-eps)/alpha;
             int sector = point.get_phi()/alpha;
-//cout << "sector = " << sector << "\n";
-            //double phi_org = point.get_phi()/sector;
             double phi_org = point.get_phi()-sector*alpha;
-//cout << "phi_org = " << phi_org << "\n";
             double r_org   = point.get_r();
             double x_org = r_org*cos(phi_org);
             double y_org = r_org*sin(phi_org);
-//cout<<"(x_org,y_org) = (" << x_org << "," << y_org << ")\n";
-            int i_x_org = (x_org-xmin)/delta_x;
-            int i_y_org = (ymax-y_org)/delta_y;
-//cout<<"(i_x,i_y) = (" << i_x << "," << i_y <<")\n";
-//cout<<"(i_x_org,i_y_org) = (" << i_x_org << "," << i_y_org <<")\n";
+            int i_x_org = round((x_org-xmin)/delta_x);
+            int i_y_org = round((ymax-y_org)/delta_y);
+            if(debug){
+              cout<<"(x,y) = (" << x << "," << y << ")\n";
+              cout<<"phi = " << point.get_phi() << "\n";
+              cout<<"(i_x,i_y) = (" << i_x << "," << i_y <<")\n";
+              cout<< "sector = " << sector << "\n";
+              cout<<"(x_org,y_org) = (" << x_org << "," 
+                  << y_org << ")\n";
+              cout<< "phi_org = " << phi_org << "\n";
+              cout<<"(i_x_org,i_y_org) = (" << i_x_org << ","
+                  << i_y_org <<")\n";
+              cout << "--------------\n";
+            }
             grid_ref[i_y][i_x] = grid[i_y_org][i_x_org];
           }
-//cout << "--------------\n";
         }
       }
 

@@ -20,6 +20,8 @@ class Init {
     int m_n;
     /* animation parameters*/
     int m_N;
+    /* debugging */
+    bool m_debug;
 
   public:
     Init(int argc, char* argv[]);
@@ -35,6 +37,8 @@ class Init {
     int get_gridwidth() { return m_gridwidth; }
 
     int get_N() { return m_N; }
+
+    bool get_debug() { return m_debug; }
 };
 
 #endif /* INIT_H */

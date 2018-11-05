@@ -11,7 +11,10 @@ Init::Init(int argc, char* argv[]){
     ("steps"    , po::value<int>(), "number of csv-files")
     ("exponent" , po::value<int>(), "n in f(z)=z**n+c")
     ("radius"   , po::value<double>(), "r in c=r*exp(i*phi)")
-    ("card"     , po::value<string>() -> default_value("RunCards/Run_1.ini"), "path to a run card (including run card)");
+    ("card"     , po::value<string>() -> default_value("RunCards/Run_1.ini"), 
+    "path to a run card (including run card)")
+    ("debug"    , po::value<int>() -> default_value(0), 
+    "display debugging information");
 
   boost::program_options::variables_map vm;
   boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
@@ -22,6 +25,7 @@ Init::Init(int argc, char* argv[]){
     throw "help";
   }
 
+  m_debug = vm["debug"].as<const int>();
   string card = vm["card"].as<string>();
   boost::property_tree::ptree pt;
   boost::property_tree::ini_parser::read_ini( card, pt );
