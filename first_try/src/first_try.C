@@ -18,8 +18,8 @@ int main(int argc, char* argv[]){
 
     Init init(argc, argv);
     const int    n   = init.get_n();
-    const double r   = init.get_r();
-    const double phi = init.get_phi();
+    const double r_c   = init.get_r();
+    const double phi_c = init.get_phi();
     const double xmin = init.get_xmin();
     const double xmax = init.get_xmax();
     const double ymin = init.get_ymin();
@@ -33,16 +33,20 @@ int main(int argc, char* argv[]){
 //    const double delta_y = (ymax-ymin)/(gridwidth);
     const int N = init.get_N();
     const double alpha = 2.*M_PI/n;
-    const double eps   = M_PI/90; //TODO: increase with n
+    const double eps   = (n==2)||(n==4) ? 0. : n==3 ? 20.*M_PI/180 
+                         : 4.*M_PI/180;
+cout << eps;
     const bool debug = init.get_debug();
-//cout<<"alpha = " << alpha << "\n";
+
+    if(debug) cout<<"alpha = " << alpha << "\n";
 
     /* iterate over steps, each producing one csv-file */
     for(int t=0; t<N/2; t++){
-      vector<vector<double>> grid(gridwidth,
-                             vector<double>(gridwidth,0));
-      vector<vector<double>> &grid_ref = grid;
-      Point point(n,r,phi+2*M_PI*t/N);
+      vector<vector<int>> grid(gridwidth,
+                             vector<int>(gridwidth,0));
+      vector<vector<int*>> grid_p(gridwidth,vector<int*>(gridwidth));
+
+      Point point(n,r_c,phi_c+2*M_PI*t/N);
 
       for(int i_y=0; i_y<gridwidth; i_y++){
         double y = ymax - i_y*delta_y;
@@ -50,25 +54,27 @@ int main(int argc, char* argv[]){
         for(int i_x=0; i_x<gridwidth; i_x++){
           double x = xmin + i_x*delta_x;
 
+          /* associate grid of pointers with original grid */
+          grid_p[i_y][i_x] = &grid[i_y][i_x];
           point.set_point(x,y);
           /* fill zeroth sector and area outside circle */
-          if (x*x+y*y>rmin2 || 
-              (0.<=point.get_phi() && point.get_phi()<=alpha+eps) ){
+          double phi = point.get_phi();
+          if (x*x+y*y>rmin2 || (0.<=phi && phi<=alpha+eps) ){
             int it = point.get_it();
             grid[i_y][i_x] = it;
           }
           else{
             /* fill missing sectors */
             int sector = point.get_phi()/alpha;
-            double phi_org = point.get_phi()-sector*alpha;
+            double phi_org = phi-sector*alpha;
             double r_org   = point.get_r();
             double x_org = r_org*cos(phi_org);
             double y_org = r_org*sin(phi_org);
             int i_x_org = round((x_org-xmin)/delta_x);
             int i_y_org = round((ymax-y_org)/delta_y);
-            if(debug){
+            if(debug && i_y==44 && i_x==46){
               cout<<"(x,y) = (" << x << "," << y << ")\n";
-              cout<<"phi = " << point.get_phi() << "\n";
+              cout<<"phi = " << phi << "\n";
               cout<<"(i_x,i_y) = (" << i_x << "," << i_y <<")\n";
               cout<< "sector = " << sector << "\n";
               cout<<"(x_org,y_org) = (" << x_org << "," 
@@ -78,7 +84,7 @@ int main(int argc, char* argv[]){
                   << i_y_org <<")\n";
               cout << "--------------\n";
             }
-            grid_ref[i_y][i_x] = grid[i_y_org][i_x_org];
+            grid_p[i_y][i_x] = &grid[i_y_org][i_x_org];
           }
         }
       }
@@ -90,12 +96,12 @@ int main(int argc, char* argv[]){
       ss2 << setw(3) << setfill('0') << N-1-t;
       cout << ss1.str() << "\n";
       myfile1.open("output"+ss1.str()+".csv");
-      for(vector<vector<double>>::iterator yrow_it=grid_ref.begin();
-          yrow_it!=grid_ref.end(); ++yrow_it){
-        for(vector<double>::iterator xrow_it=yrow_it->begin();
+      for(vector<vector<int*>>::iterator yrow_it=grid_p.begin();
+          yrow_it!=grid_p.end(); ++yrow_it){
+        for(vector<int*>::iterator xrow_it=yrow_it->begin();
             xrow_it!=yrow_it->end(); ++xrow_it){
-          if (xrow_it!=yrow_it->begin()) myfile1 << "," << *xrow_it;
-          else myfile1 << *xrow_it;
+          if (xrow_it!=yrow_it->begin()) myfile1 << "," << **xrow_it;
+          else myfile1 << **xrow_it;
         }
         myfile1 << "\n";
       }
@@ -103,12 +109,12 @@ int main(int argc, char* argv[]){
 
       /* write to file N/2-N*/
       myfile2.open("output"+ss2.str()+".csv");
-      for(vector<vector<double>>::reverse_iterator yrow_rit=grid_ref.rbegin();
-          yrow_rit!=grid_ref.rend(); ++yrow_rit){
-        for(vector<double>::iterator xrow_it=yrow_rit->begin();
+      for(vector<vector<int*>>::reverse_iterator yrow_rit=grid_p.rbegin();
+          yrow_rit!=grid_p.rend(); ++yrow_rit){
+        for(vector<int*>::iterator xrow_it=yrow_rit->begin();
             xrow_it!=yrow_rit->end(); ++xrow_it){
-          if (xrow_it!=yrow_rit->begin()) myfile2 << "," << *xrow_it;
-          else myfile2 << *xrow_it;
+          if (xrow_it!=yrow_rit->begin()) myfile2 << "," << **xrow_it;
+          else myfile2 << **xrow_it;
         }
         myfile2 << "\n";
       }
