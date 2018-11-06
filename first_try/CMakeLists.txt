@@ -1,23 +1,16 @@
 cmake_minimum_required(VERSION 2.8.9)
 project (firsttry)
 
-macro(use_cxx11)
-  if (CMAKE_VERSION VERSION_LESS "3.1")
-    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-    endif ()
-  else ()
-    set (CMAKE_CXX_STANDARD 11)
-  endif ()
-endmacro(use_cxx11)
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -std=c++11")
 
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
-use_cxx11()
-
-#set (CMAKE_CXX_STANDARD 11)
 include_directories (include)
 file (GLOB SOURCES "src/*.C")
 
-#find_package(Boost 1.54 COMPONENTS program_options REQUIRED)
+# for laptop
+find_package(Boost 1.54 COMPONENTS program_options REQUIRED)
+# for pktfs
+link_directories(/cvmfs/sft.cern.ch/lcg/releases/LCG_94/Boost/1.66.0/x86_64-centos7-gcc62-dbg/lib)
+include_directories(/cvmfs/sft.cern.ch/lcg/releases/LCG_94/Boost/1.66.0/x86_64-centos7-gcc62-dbg/include)
+
 add_executable(first_try ${SOURCES})
 target_link_libraries(first_try boost_program_options)
