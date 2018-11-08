@@ -24,7 +24,9 @@ int main(int argc, char* argv[]){
     const double xmax = init.get_xmax();
     const double ymin = init.get_ymin();
     const double ymax = init.get_ymax();
-    const double rmin2 = min(xmax*xmax,ymax*ymax);
+    const double max_radius2 = min(xmax*xmax,ymax*ymax);
+    const double min_radius2 = (n==11) ? 0.002*max_radius2
+                                       : 0.001*max_radius2;
     const double gridwidth = init.get_gridwidth();
     const double delta_x = gridwidth==1 ? 0:(xmax-xmin)/(gridwidth-1);
     const double delta_y = gridwidth==1 ? 0:(ymax-ymin)/(gridwidth-1);
@@ -33,12 +35,13 @@ int main(int argc, char* argv[]){
 //    const double delta_y = (ymax-ymin)/(gridwidth);
     const int N = init.get_N();
     const double alpha = 2.*M_PI/n;
-    const double eps   = (n==2)||(n==4) ? 0. : n==3 ? 20.*M_PI/180 
-                         : 4.*M_PI/180;
-cout << eps;
+    const double eps1   = (n==2)||(n==4) ? 0. : 4.*M_PI/180;
+    const double eps2   = (n==8) ? 6.*M_PI/180 : 0;
     const bool debug = init.get_debug();
 
     if(debug) cout<<"alpha = " << alpha << "\n";
+    if(debug) cout<<"eps1 = " << eps1 << "\n";
+    if(debug) cout<<"eps2 = " << eps1 << "\n";
 
     /* iterate over steps, each producing one csv-file */
     for(int t=0; t<N/2; t++){
@@ -57,9 +60,13 @@ cout << eps;
           /* associate grid of pointers with original grid */
           grid_p[i_y][i_x] = &grid[i_y][i_x];
           point.set_point(x,y);
-          /* fill zeroth sector and area outside circle */
           double phi = point.get_phi();
-          if (x*x+y*y>rmin2 || (0.<=phi && phi<=alpha+eps) ){
+          double radius2 = x*x+y*y;
+          /* fill zeroth sector and area outside circle */
+          if (radius2>max_radius2 
+              || (0.<=phi && phi<=alpha+eps1)
+              || phi>2.*M_PI-eps2
+              || radius2<min_radius2 ){
             int it = point.get_it();
             grid[i_y][i_x] = it;
           }
@@ -72,7 +79,7 @@ cout << eps;
             double y_org = r_org*sin(phi_org);
             int i_x_org = round((x_org-xmin)/delta_x);
             int i_y_org = round((ymax-y_org)/delta_y);
-            if(debug && i_y==44 && i_x==46){
+            if(debug && i_y==45 && i_x==45){
               cout<<"(x,y) = (" << x << "," << y << ")\n";
               cout<<"phi = " << phi << "\n";
               cout<<"(i_x,i_y) = (" << i_x << "," << i_y <<")\n";
@@ -82,12 +89,26 @@ cout << eps;
               cout<< "phi_org = " << phi_org << "\n";
               cout<<"(i_x_org,i_y_org) = (" << i_x_org << ","
                   << i_y_org <<")\n";
+                  <<"\n"; 
               cout << "--------------\n";
             }
             grid_p[i_y][i_x] = &grid[i_y_org][i_x_org];
           }
         }
       }
+
+      if(debug){
+        for(int i_y=0; i_y<gridwidth; i_y++){
+          double y = ymax - i_y*delta_y;
+          for(int i_x=0; i_x<gridwidth; i_x++){
+            double x = xmin + i_x*delta_x;
+            if (x*x+y*y<max_radius2 && *grid_p[i_y][i_x]==0) 
+              cout << "i_y = " << i_y
+                   << "i_x = " << i_x << "\n";
+          }
+        }
+      }
+
 
       /* write to file 1-N/2 */
       ofstream myfile1, myfile2;

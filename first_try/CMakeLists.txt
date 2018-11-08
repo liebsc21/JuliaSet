@@ -7,7 +7,7 @@ include_directories (include)
 file (GLOB SOURCES "src/*.C")
 
 # for laptop
-find_package(Boost 1.54 COMPONENTS program_options REQUIRED)
+#find_package(Boost 1.54 COMPONENTS program_options REQUIRED)
 # for pktfs
 link_directories(/cvmfs/sft.cern.ch/lcg/releases/LCG_94/Boost/1.66.0/x86_64-centos7-gcc62-dbg/lib)
 include_directories(/cvmfs/sft.cern.ch/lcg/releases/LCG_94/Boost/1.66.0/x86_64-centos7-gcc62-dbg/include)
