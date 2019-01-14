@@ -66,10 +66,10 @@ def main(argv):
         im.axes.get_xaxis().set_visible(False)
         im.axes.get_yaxis().set_visible(False)
         steps.append([im])
-        plt.savefig('test_{}.png'.format(i), bbox_inches='tight')
+#        plt.savefig('test_{}.png'.format(i), bbox_inches='tight')
 
     ani = animation.ArtistAnimation(fig, steps, interval=50, blit=True)
-    ani.save('animation.mp4', bitrate=100000)
+#    ani.save('animation.mp4', bitrate=100000)
     plt.show()
 
 
