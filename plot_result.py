@@ -45,7 +45,7 @@ def main(argv):
     plt.axis('off')
     files = [f for f in os.listdir(".") if f.startswith("output") and f.endswith(".csv")]
     files.sort()
-    pprint.pprint(files)
+#    pprint.pprint(files)
 
     steps = []
 
