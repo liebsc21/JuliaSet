@@ -22,7 +22,7 @@ Init::Init(int argc, char* argv[]){
 
   if (vm.count("help")) {
     cout << desc << '\n';
-    throw "help";
+    throw 1;
   }
 
   m_debug = vm["debug"].as<const int>();

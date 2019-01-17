@@ -89,7 +89,6 @@ int main(int argc, char* argv[]){
               cout<< "phi_org = " << phi_org << "\n";
               cout<<"(i_x_org,i_y_org) = (" << i_x_org << ","
                   << i_y_org <<")\n";
-                  <<"\n"; 
               cout << "--------------\n";
             }
             grid_p[i_y][i_x] = &grid[i_y_org][i_x_org];
@@ -149,9 +148,10 @@ int main(int argc, char* argv[]){
   }
   catch(exception& e) {
     cerr << "error: " << e.what() << "\n";
+    cerr << "type '--help' to view options\n";
     return 1;
   }
-  catch(string &s)  /* exception, if help-option is given */ 
+  catch(int &i)  /* exception, if help-option is given */ 
   {
     return 1;
   }
