@@ -6,14 +6,15 @@ Init::Init(int argc, char* argv[]){
   /* program options */
   boost::program_options::options_description desc("Allowed options");
   desc.add_options()
-    ("help", "produce help message")
-    ("gridwidth", po::value<int>(), "number of pixels in x- and y-direction")
-    ("steps"    , po::value<int>(), "number of csv-files")
-    ("exponent" , po::value<int>(), "n in f(z)=z**n+c")
-    ("radius"   , po::value<double>(), "r in c=r*exp(i*phi)")
-    ("card"     , po::value<string>() -> default_value("RunCards/Run_1.ini"), 
+    ("help,h", "produce help message")
+    ("gridwidth,g", po::value<int>(), "number of pixels in x- and y-direction")
+    ("steps,s"    , po::value<int>(), "number of csv-files")
+    ("exponent,e" , po::value<int>(), "n in f(z)=z**n+c")
+    ("radius,r"   , po::value<double>(), "r in c=r*exp(i*phi)")
+    ("phi,p"      , po::value<double>(), "phi in c=r*exp(i*phi)")
+    ("card,c"     , po::value<string>() -> default_value("RunCards/Run_1.ini"), 
     "path to a run card (including run card)")
-    ("debug"    , po::value<int>() -> default_value(0), 
+    ("debug,d"    , po::value<int>() -> default_value(0), 
     "display debugging information");
 
   boost::program_options::variables_map vm;
