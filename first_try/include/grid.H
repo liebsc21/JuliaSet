@@ -2,6 +2,7 @@
 #define GRID_H
 
 #include <vector>
+//#include <list>// TODO: Check whether useing list somewhere is faster
 using namespace std;
 
 class Grid {

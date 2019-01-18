@@ -1,7 +1,4 @@
 #include <iostream>
-
-#include <sstream>
-#include <string>
 #include <iomanip>
 #include "grid.H"
 #include "init.H"

@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "point.H"
 
 void Point::set_point(const double &re, const double &im){
