@@ -7,24 +7,27 @@ using namespace std;
 class Grid {
 
   private:
+    /* function parameters */
     int n;
     double r_c;
     double phi_c;
-    double xmin;
-    double xmax;
-    double ymin;
-    double ymax;
-    double max_radius2;
-    double min_radius2;
+
+    /* grid parameters */
     double gridwidth;
-    double delta_x;
-    double delta_y;
-    int N;
+    double xmin, xmax, ymin, ymax;
+    double max_radius2, min_radius2;
+    double delta_x, delta_y;
     double alpha;
-    double eps1;
-    double eps2;
+    double eps1, eps2;
+
+    /* number of csv-files */
+    int N;
+
     bool debug;
-    vector<vector<int*>> grid_p;
+
+    /* grid, which stores iterations for each point
+       in the complex plane */
+    vector<vector<int*>> grid;
 
   public:
     Grid(int argc, char* argv[]);

@@ -11,6 +11,7 @@ namespace po = boost::program_options;
 using namespace std;
 
 class Init {
+
   private:
     /* grid parameters */
     double m_xmin, m_xmax, m_ymin, m_ymax;
@@ -18,7 +19,7 @@ class Init {
     /* function parameters */
     double m_r, m_phi;
     int m_n;
-    /* animation parameters*/
+    /* number of csv-files */
     int m_N;
     /* debugging */
     bool m_debug;

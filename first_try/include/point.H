@@ -7,19 +7,20 @@
 using namespace std;
 
 class Point {
+
   private:
     const complex<double> I = {0.0,1.0};
     const int m_n;
     const complex<double> m_c;
     complex<double> m_z;
     int m_it;
+
   public:
     Point(const int &n, const double &r, const double &phi) : 
       m_n(n), m_c(polar(r,phi)) {}
     void set_point(const double &re, const double &im);
     void f();
     int get_it();
-    //TODO: make m_z public and invoke arg directly in main -> faster?
     double get_phi();
     double get_r(){ return abs(m_z); }
 };

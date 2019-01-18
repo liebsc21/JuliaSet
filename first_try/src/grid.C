@@ -12,30 +12,39 @@ using namespace std;
 Grid::Grid(int argc, char* argv[]){
 
     Init init(argc, argv);
-    n   = init.get_n();
+
+    /* function parameters */
+    n     = init.get_n();
     r_c   = init.get_r();
     phi_c = init.get_phi();
-    xmin = init.get_xmin();
-    xmax = init.get_xmax();
-    ymin = init.get_ymin();
-    ymax = init.get_ymax();
+
+    /* grid parameters */
+    gridwidth   = init.get_gridwidth();
+    xmin        = init.get_xmin();
+    xmax        = init.get_xmax();
+    ymin        = init.get_ymin();
+    ymax        = init.get_ymax();
     max_radius2 = min(xmax*xmax,ymax*ymax);
     min_radius2 = (n==11) ? 0.002*max_radius2 : 0.001*max_radius2;
-    gridwidth = init.get_gridwidth();
-    delta_x = gridwidth==1 ? 0:(xmax-xmin)/(gridwidth-1);
-    delta_y = gridwidth==1 ? 0:(ymax-ymin)/(gridwidth-1);
+    delta_x     = gridwidth==1 ? 0:(xmax-xmin)/(gridwidth-1);
+    delta_y     = gridwidth==1 ? 0:(ymax-ymin)/(gridwidth-1);
     /* this is how Carsten calculates it */
-//    delta_x = (xmax-xmin)/(gridwidth);
-//    delta_y = (ymax-ymin)/(gridwidth);
+    //delta_x = (xmax-xmin)/(gridwidth);
+    //delta_y = (ymax-ymin)/(gridwidth);
+    alpha       = 2.*M_PI/n;
+    eps1        = (n==2)||(n==4) ? 0. : 4.*M_PI/180;
+    eps2        = (n==8) ? 6.*M_PI/180 : 0;
+
+    /* number of csv-files */
     N = init.get_N();
-    alpha = 2.*M_PI/n;
-    eps1   = (n==2)||(n==4) ? 0. : 4.*M_PI/180;
-    eps2   = (n==8) ? 6.*M_PI/180 : 0;
+
     debug = init.get_debug();
 
-    grid_p.resize(gridwidth);
+    /* (re)size grid (which stores iterations for each point
+       in the complex plane) to appropriate size */
+    grid.resize(gridwidth);
     for(int i=0; i<gridwidth; i++){
-      grid_p[i].resize(gridwidth);
+      grid[i].resize(gridwidth);
     }
 
 //    if(debug) cout<<"alpha = " << alpha << "\n";
@@ -47,7 +56,9 @@ Grid::Grid(int argc, char* argv[]){
 
 void Grid::calc_grid(const int t){ 
 
-  static vector<vector<int>> grid(gridwidth,
+  /* This is an auxiliary grid, which is static, as 'grid' 
+     refers to it. It must therefore not go out of scope. */
+  static vector<vector<int>> grid_aux(gridwidth,
                          vector<int>(gridwidth,0));
 
   Point point(n,r_c,phi_c+2*M_PI*t/N);
@@ -58,21 +69,24 @@ void Grid::calc_grid(const int t){
     for(int i_x=0; i_x<gridwidth; i_x++){
       double x = xmin + i_x*delta_x;
 
-      /* associate grid of pointers with original grid */
-      grid_p[i_y][i_x] = &grid[i_y][i_x];
+      /* associate grid with auxiliary grid */
+      grid[i_y][i_x] = &grid_aux[i_y][i_x];
+
       point.set_point(x,y);
       double phi = point.get_phi();
       double radius2 = x*x+y*y;
+
       /* fill zeroth sector and area outside circle */
       if (radius2>max_radius2 
           || (0.<=phi && phi<=alpha+eps1)
           || phi>2.*M_PI-eps2
           || radius2<min_radius2 ){
         int it = point.get_it();
-        grid[i_y][i_x] = it;
+        grid_aux[i_y][i_x] = it;
       }
+
+      /* fill missing sectors */
       else{
-        /* fill missing sectors */
         int sector = point.get_phi()/alpha;
         double phi_org = phi-sector*alpha;
         double r_org   = point.get_r();
@@ -92,7 +106,7 @@ void Grid::calc_grid(const int t){
               << i_y_org <<")\n";
           cout << "--------------\n";
         }
-        grid_p[i_y][i_x] = &grid[i_y_org][i_x_org];
+        grid[i_y][i_x] = &grid_aux[i_y_org][i_x_org];
       }
     }
   }
@@ -101,9 +115,9 @@ void Grid::calc_grid(const int t){
 //      double y = ymax - i_y*delta_y;
       for(int i_x=0; i_x<gridwidth; i_x++){
 //        double x = xmin + i_x*delta_x;
-//        if (x*x+y*y<max_radius2 && *grid_p[i_y][i_x]==0) 
-          cout << "*grid_p[" << i_y << ", "<< i_x << "] = " 
-               << *grid_p[i_y][i_x] << "\n";
+//        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0) 
+          cout << "*grid[" << i_y << ", "<< i_x << "] = " 
+               << *grid[i_y][i_x] << "\n";
       }
     }
   }
@@ -117,9 +131,9 @@ void Grid::write_to_file(const int t){
 //      double y = ymax - i_y*delta_y;
       for(int i_x=0; i_x<gridwidth; i_x++){
 //        double x = xmin + i_x*delta_x;
-//        if (x*x+y*y<max_radius2 && *grid_p[i_y][i_x]==0) 
-          cout << "*grid_p[" << i_y << ", "<< i_x << "] = " 
-               << *grid_p[i_y][i_x] << "\n";
+//        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0) 
+          cout << "*grid[" << i_y << ", "<< i_x << "] = " 
+               << *grid[i_y][i_x] << "\n";
       }
     }
   }
@@ -131,8 +145,8 @@ void Grid::write_to_file(const int t){
   ss2 << setw(3) << setfill('0') << N-1-t;
   cout << ss1.str() << "\n";
   myfile1.open("output"+ss1.str()+".csv");
-  for(vector<vector<int*>>::iterator yrow_it=grid_p.begin();
-      yrow_it!=grid_p.end(); ++yrow_it){
+  for(vector<vector<int*>>::iterator yrow_it=grid.begin();
+      yrow_it!=grid.end(); ++yrow_it){
     for(vector<int*>::iterator xrow_it=yrow_it->begin();
         xrow_it!=yrow_it->end(); ++xrow_it){
       if (xrow_it!=yrow_it->begin()) myfile1 << "," << **xrow_it;
@@ -144,8 +158,8 @@ void Grid::write_to_file(const int t){
 
   /* write to file N/2-N*/
   myfile2.open("output"+ss2.str()+".csv");
-  for(vector<vector<int*>>::reverse_iterator yrow_rit=grid_p.rbegin();
-      yrow_rit!=grid_p.rend(); ++yrow_rit){
+  for(vector<vector<int*>>::reverse_iterator yrow_rit=grid.rbegin();
+      yrow_rit!=grid.rend(); ++yrow_rit){
     for(vector<int*>::iterator xrow_it=yrow_rit->begin();
         xrow_it!=yrow_rit->end(); ++xrow_it){
       if (xrow_it!=yrow_rit->begin()) myfile2 << "," << **xrow_it;
