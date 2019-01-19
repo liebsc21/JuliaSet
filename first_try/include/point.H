@@ -6,23 +6,26 @@
 
 using namespace std;
 
+template <class T>
 class Point {
 
   private:
-    const complex<double> I = {0.0,1.0};
+    const complex<T> I = {0.0,1.0};
     const int m_n;
-    const complex<double> m_c;
-    complex<double> m_z;
+    const complex<T> m_c;
+    complex<T> m_z;
     int m_it;
 
   public:
-    Point(const int &n, const double &r, const double &phi) : 
+    Point(const int &n, const T &r, const T &phi) : 
       m_n(n), m_c(polar(r,phi)) {}
-    void set_point(const double &re, const double &im);
+    void set_point(const T &re, const T &im);
     void f();
     int get_it();
-    double get_phi();
-    double get_r(){ return abs(m_z); }
+    T get_phi();
+    T get_r(){ return abs(m_z); }
 };
+
+#include "point.inl"
 
 #endif /* POINT_H */

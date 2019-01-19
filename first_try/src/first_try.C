@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
   try{
     auto start = chrono::steady_clock::now();
   
-    Grid grid(argc, argv);
+    Grid<double> grid(argc, argv);
     int N = grid.get_N();
   
     /* iterate over steps, each producing one csv-file */

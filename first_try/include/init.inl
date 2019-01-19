@@ -1,7 +1,11 @@
-#include <iostream>
-#include "init.H"
+#ifndef INIT_INL
+#define INIT_INL
 
-Init::Init(int argc, char* argv[]){
+#include <iostream>
+//#include "init.H"
+
+template <typename T>
+Init<T>::Init(int argc, char* argv[]){
 
   /* TODO: comment */
   boost::program_options::positional_options_description p;
@@ -14,8 +18,8 @@ Init::Init(int argc, char* argv[]){
     ("gridwidth,g", po::value<int>(), "number of pixels in x- and y-direction")
     ("steps,s"    , po::value<int>(), "number of csv-files")
     ("exponent,e" , po::value<int>(), "n in f(z)=z**n+c")
-    ("radius,r"   , po::value<double>(), "r in c=r*exp(i*phi)")
-    ("phi,p"      , po::value<double>(), "phi in c=r*exp(i*phi)")
+    ("radius,r"   , po::value<T>(), "r in c=r*exp(i*phi)")
+    ("phi,p"      , po::value<T>(), "phi in c=r*exp(i*phi)")
     ("card,c"     , po::value<string>() -> default_value("RunCards/Run_1.ini"), 
     "path to a run card (including run card)")
     ("debug,d"    , po::value<int>() -> default_value(0), 
@@ -40,15 +44,15 @@ Init::Init(int argc, char* argv[]){
 
   /* grid parameters */
   m_gridwidth = pt.get<int>   ("grid parameters.gridwidth");
-  m_xmin      = pt.get<double>("grid parameters.xmin");
-  m_xmax      = pt.get<double>("grid parameters.xmax");
-  m_ymin      = pt.get<double>("grid parameters.ymin");
-  m_ymax      = pt.get<double>("grid parameters.ymax");
+  m_xmin      = pt.get<T>("grid parameters.xmin");
+  m_xmax      = pt.get<T>("grid parameters.xmax");
+  m_ymin      = pt.get<T>("grid parameters.ymin");
+  m_ymax      = pt.get<T>("grid parameters.ymax");
 
   /* function parametes */
   m_n   = pt.get<int>   ("function parameters.n");
-  m_r   = pt.get<double>("function parameters.r");
-  m_phi = pt.get<double>("function parameters.phi");
+  m_r   = pt.get<T>("function parameters.r");
+  m_phi = pt.get<T>("function parameters.phi");
 
   /* number of csv-files */
   m_N = pt.get<int>("animation parameters.N");
@@ -61,5 +65,7 @@ Init::Init(int argc, char* argv[]){
   if(vm.count("exponent"))
      m_n = vm["exponent"].as<const int>();
   if(vm.count("radius"))
-     m_r = vm["radius"].as<const double>();
+     m_r = vm["radius"].as<const T>();
 }
+
+#endif /* INIT_INL */

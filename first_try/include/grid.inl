@@ -1,14 +1,18 @@
+#ifndef GRID_INL
+#define GRID_INL
+
 #include <iostream>
 #include <iomanip>
-#include "grid.H"
+//#include "grid.H"
 #include "init.H"
 #include "point.H"
 
 using namespace std;
 
-Grid::Grid(int argc, char* argv[]){
+template <typename T>
+Grid<T>::Grid(int argc, char* argv[]){
 
-    Init init(argc, argv);
+    Init<T> init(argc, argv);
 
     /* function parameters */
     n     = init.get_n();
@@ -51,27 +55,28 @@ Grid::Grid(int argc, char* argv[]){
 
 
 
-void Grid::calc_grid(const int t){ 
+template <typename T>
+void Grid<T>::calc_grid(const int t){ 
 
   /* This is an auxiliary grid, which is static, as 'grid' 
      refers to it. It must therefore not go out of scope. */
   static vector<vector<int>> grid_aux(gridwidth,
                          vector<int>(gridwidth,0));
 
-  Point point(n,r_c,phi_c+2*M_PI*t/N);
+  Point<T> point(n,r_c,phi_c+2*M_PI*t/N);
 
   for(int i_y=0; i_y<gridwidth; i_y++){
-    double y = ymax - i_y*delta_y;
+    T y = ymax - i_y*delta_y;
 
     for(int i_x=0; i_x<gridwidth; i_x++){
-      double x = xmin + i_x*delta_x;
+      T x = xmin + i_x*delta_x;
 
       /* associate grid with auxiliary grid */
       grid[i_y][i_x] = &grid_aux[i_y][i_x];
 
       point.set_point(x,y);
-      double phi = point.get_phi();
-      double radius2 = x*x+y*y;
+      T phi = point.get_phi();
+      T radius2 = x*x+y*y;
 
       /* fill zeroth sector and area outside circle */
       if (radius2>max_radius2 
@@ -85,10 +90,10 @@ void Grid::calc_grid(const int t){
       /* fill missing sectors */
       else{
         int sector = point.get_phi()/alpha;
-        double phi_org = phi-sector*alpha;
-        double r_org   = point.get_r();
-        double x_org = r_org*cos(phi_org);
-        double y_org = r_org*sin(phi_org);
+        T phi_org = phi-sector*alpha;
+        T r_org   = point.get_r();
+        T x_org = r_org*cos(phi_org);
+        T y_org = r_org*sin(phi_org);
         int i_x_org = round((x_org-xmin)/delta_x);
         int i_y_org = round((ymax-y_org)/delta_y);
         if(debug && i_y==45 && i_x==45){
@@ -109,9 +114,9 @@ void Grid::calc_grid(const int t){
   }
   if(debug){
     for(int i_y=0; i_y<gridwidth; i_y++){
-//      double y = ymax - i_y*delta_y;
+//      T y = ymax - i_y*delta_y;
       for(int i_x=0; i_x<gridwidth; i_x++){
-//        double x = xmin + i_x*delta_x;
+//        T x = xmin + i_x*delta_x;
 //        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0) 
           cout << "*grid[" << i_y << ", "<< i_x << "] = " 
                << *grid[i_y][i_x] << "\n";
@@ -120,14 +125,16 @@ void Grid::calc_grid(const int t){
   }
 }
 
-void Grid::write_to_file(const int t){
+
+template <typename T>
+void Grid<T>::write_to_file(const int t){
 
   if(debug){
     cout << "write out\n";
     for(int i_y=0; i_y<gridwidth; i_y++){
-//      double y = ymax - i_y*delta_y;
+//      T y = ymax - i_y*delta_y;
       for(int i_x=0; i_x<gridwidth; i_x++){
-//        double x = xmin + i_x*delta_x;
+//        T x = xmin + i_x*delta_x;
 //        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0) 
           cout << "*grid[" << i_y << ", "<< i_x << "] = " 
                << *grid[i_y][i_x] << "\n";
@@ -166,3 +173,5 @@ void Grid::write_to_file(const int t){
   }
   myfile2.close();
 }
+
+#endif /* GRID_INL */
