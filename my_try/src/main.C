@@ -16,7 +16,7 @@ int main(int argc, char* argv[]){
     int N = grid.get_N();
   
     /* iterate over steps, each producing one csv-file */
-    for(int t=0; t<N/2; t++){
+    for(int t=0; t<(N+1)/2; t++){
       grid.calc_grid(t);
       grid.write_to_file(t);
     }
