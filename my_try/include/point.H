@@ -23,7 +23,7 @@ class Point {
     void f();
     int get_it();
     T get_phi();
-    T get_r(){ return abs(m_z); }
+    T get_r()                                { return abs(m_z); }
 };
 
 #include "point.inl"

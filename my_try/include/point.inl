@@ -1,8 +1,6 @@
 #ifndef POINT_INL
 #define POINT_INL
 
-//#include "point.H"
-
 template <typename T>
 void Point<T>::set_point(const T &re, const T &im){
   m_z  = {re,im};
@@ -12,7 +10,7 @@ void Point<T>::set_point(const T &re, const T &im){
 template <typename T>
 void Point<T>::f(){
   m_it++;
-  /* TODO: problem, if T=float */
+  /* TODO: problem, if T=float on laptop */
   m_z = pow(m_z,m_n) + m_c;
 }
 

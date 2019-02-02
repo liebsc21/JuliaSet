@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <iomanip>
-//#include "grid.H"
 #include "init.H"
 #include "point.H"
 
@@ -48,9 +47,9 @@ Grid<T>::Grid(int argc, char* argv[]){
       grid[i].resize(gridwidth);
     }
 
-//    if(debug) cout<<"alpha = " << alpha << "\n";
-//    if(debug) cout<<"eps1 = " << eps1 << "\n";
-//    if(debug) cout<<"eps2 = " << eps1 << "\n";
+    if(debug) cout<<"alpha = " << alpha << "\n";
+    if(debug) cout<<"eps1 = " << eps1 << "\n";
+    if(debug) cout<<"eps2 = " << eps1 << "\n";
 }
 
 
@@ -78,7 +77,9 @@ void Grid<T>::calc_grid(const int t){
       T phi = point.get_phi();
       T radius2 = x*x+y*y;
 
-      /* fill zeroth sector and area outside circle */
+      /* fill zeroth sector and area outside circle
+         and a little more to ensure that the whole
+         plane is covered (distrctisation problem of grid)*/
       if (radius2>max_radius2 
           || (0.<=phi && phi<=alpha+eps1)
           || phi>2.*M_PI-eps2
@@ -96,28 +97,30 @@ void Grid<T>::calc_grid(const int t){
         T y_org = r_org*sin(phi_org);
         int i_x_org = round((x_org-xmin)/delta_x);
         int i_y_org = round((ymax-y_org)/delta_y);
+
         if(debug && i_y==45 && i_x==45){
-          cout<<"(x,y) = (" << x << "," << y << ")\n";
-          cout<<"phi = " << phi << "\n";
-          cout<<"(i_x,i_y) = (" << i_x << "," << i_y <<")\n";
-          cout<< "sector = " << sector << "\n";
-          cout<<"(x_org,y_org) = (" << x_org << "," 
-              << y_org << ")\n";
-          cout<< "phi_org = " << phi_org << "\n";
-          cout<<"(i_x_org,i_y_org) = (" << i_x_org << ","
-              << i_y_org <<")\n";
+          cout <<"(x,y) = (" << x << "," << y << ")\n";
+          cout <<"phi = " << phi << "\n";
+          cout <<"(i_x,i_y) = (" << i_x << "," << i_y <<")\n";
+          cout << "sector = " << sector << "\n";
+          cout <<"(x_org,y_org) = (" << x_org << ","
+               << y_org << ")\n";
+          cout << "phi_org = " << phi_org << "\n";
+          cout <<"(i_x_org,i_y_org) = (" << i_x_org << ","
+               << i_y_org <<")\n";
           cout << "--------------\n";
         }
+
         grid[i_y][i_x] = &grid_aux[i_y_org][i_x_org];
       }
     }
   }
   if(debug){
     for(int i_y=0; i_y<gridwidth; i_y++){
-//      T y = ymax - i_y*delta_y;
+      T y = ymax - i_y*delta_y;
       for(int i_x=0; i_x<gridwidth; i_x++){
-//        T x = xmin + i_x*delta_x;
-//        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0) 
+        T x = xmin + i_x*delta_x;
+        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0)
           cout << "*grid[" << i_y << ", "<< i_x << "] = " 
                << *grid[i_y][i_x] << "\n";
       }
@@ -129,25 +132,13 @@ void Grid<T>::calc_grid(const int t){
 template <typename T>
 void Grid<T>::write_to_file(const int t){
 
-  if(debug){
-    cout << "write out\n";
-    for(int i_y=0; i_y<gridwidth; i_y++){
-//      T y = ymax - i_y*delta_y;
-      for(int i_x=0; i_x<gridwidth; i_x++){
-//        T x = xmin + i_x*delta_x;
-//        if (x*x+y*y<max_radius2 && *grid[i_y][i_x]==0) 
-          cout << "*grid[" << i_y << ", "<< i_x << "] = " 
-               << *grid[i_y][i_x] << "\n";
-      }
-    }
-  }
-
-  /* write to file 1-N/2 */
   ofstream myfile1, myfile2;
   stringstream ss1, ss2;
   ss1 << setw(3) << setfill('0') << t;
   ss2 << setw(3) << setfill('0') << N-1-t;
   cout << ss1.str() << "\n";
+
+  /* write to file 1-N/2 */
   myfile1.open("output"+ss1.str()+".csv");
   for(vector<vector<int*>>::iterator yrow_it=grid.begin();
       yrow_it!=grid.end(); ++yrow_it){
